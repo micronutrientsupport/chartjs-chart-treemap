@@ -436,6 +436,17 @@ function parseFontOptions(options) {
 	});
 }
 
+function splitString(str, lineLength) {
+	const arr = [''];
+  
+	str.split(' ').forEach(word => {
+	  if (arr[arr.length - 1].length + word.length > lineLength) arr.push('');
+	  arr[arr.length - 1] += (word + ' ');
+	});
+  
+	return arr.map(v => v.trim()).filter((a) => a);
+}
+
 var Controller = Chart.DatasetController.extend({
 
 	dataElementType: Chart.elements.Rectangle,
