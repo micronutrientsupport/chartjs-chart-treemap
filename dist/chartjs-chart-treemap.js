@@ -1,7 +1,7 @@
 /*!
  * chartjs-chart-treemap v0.2.3
  * https://github.com/kurkle/chartjs-chart-treemap#readme
- * (c) 2020 Jukka Kurkela
+ * (c) 2021 Jukka Kurkela
  * Released under the MIT license
  */
 (function (global, factory) {
@@ -10,7 +10,7 @@ typeof define === 'function' && define.amd ? define(['chart.js'], factory) :
 (global = global || self, factory(global.Chart));
 }(this, (function (Chart) { 'use strict';
 
-Chart = Chart && Chart.hasOwnProperty('default') ? Chart['default'] : Chart;
+Chart = Chart && Object.prototype.hasOwnProperty.call(Chart, 'default') ? Chart['default'] : Chart;
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flat
 function flatten(input) {
@@ -527,7 +527,32 @@ var Controller = Chart.DatasetController.extend({
 					if (!('l' in item) || item.l === levels) {
 						ctx.textAlign = 'center';
 						ctx.textBaseline = 'middle';
-						ctx.fillText(item.g, vm.left + vm.width / 2, vm.top + vm.height / 2);
+						if(item.g.length < (vm.width / 6)) {
+							ctx.fillText(item.g, vm.left + vm.width / 2, vm.top + vm.height / 2);
+						}
+						else {
+							let string = splitString(item.g, vm.width/6);
+							let fs = vm.font.size;
+							let flh = vm.font.lineHeight;
+							let fss = vm.font.string;
+							let relWidth = (vm.width / vm.font.size);
+							if (relWidth < vm.font.size && relWidth < 5) {
+								vm.font.size = Math.ceil(relWidth)*1.75;
+								vm.font.lineHeight = (Math.ceil(relWidth)*1.75)*1.5;
+								vm.font.string = `${vm.font.style} ${vm.font.size}px ${vm.font.family}`;
+								ctx.font = vm.font.string;
+							}
+							let spread = string.length / 2 - .5;
+							let pos = -spread;
+							string.forEach((line, i) => {
+								ctx.fillText(line, vm.left + vm.width / 2, vm.top + vm.height / 2 + (vm.font.lineHeight*pos));
+								pos++;
+							});
+
+							vm.font.size = fs;
+							vm.font.lineHeight = flh;
+							vm.font.string = fss;
+						}
 					} else {
 						ctx.textAlign = 'start';
 						ctx.textBaseline = 'top';
